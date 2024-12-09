@@ -1,6 +1,8 @@
 export default [
   {
     "_id": "123",
+    "username": "ironman",
+    "password": "password123",
     "firstName": "Tony",
     "lastName": "Stark",
     "loginId": "001234561S",
@@ -11,6 +13,8 @@ export default [
   },
   {
     "_id": "234",
+    "username": "batman",
+    "password": "password234",
     "firstName": "Bruce",
     "lastName": "Wayne",
     "loginId": "001234562W",
@@ -21,6 +25,8 @@ export default [
   },
   {
     "_id": "345",
+    "username": "captainamerica",
+    "password": "password345",
     "firstName": "Steve",
     "lastName": "Rogers",
     "loginId": "001234563R",
@@ -31,6 +37,8 @@ export default [
   },
   {
     "_id": "456",
+    "username": "blackwidow",
+    "password": "password456",
     "firstName": "Natasha",
     "lastName": "Romanoff",
     "loginId": "001234564R",
@@ -41,6 +49,8 @@ export default [
   },
   {
     "_id": "567",
+    "username": "spiderman",
+    "password": "password567",
     "firstName": "Peter",
     "lastName": "Parker",
     "loginId": "001234565P",
@@ -51,6 +61,8 @@ export default [
   },
   {
     "_id": "789",
+    "username": "superman",
+    "password": "password789",
     "firstName": "Clark",
     "lastName": "Kent",
     "loginId": "001234566K",
@@ -61,6 +73,8 @@ export default [
   },
   {
     "_id": "890",
+    "username": "wonderwoman",
+    "password": "password890",
     "firstName": "Diana",
     "lastName": "Prince",
     "loginId": "001234567P",

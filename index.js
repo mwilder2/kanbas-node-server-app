@@ -1,22 +1,21 @@
-import express from 'express';
-import Hello from './Hello.js';
-import Lab5 from './Lab5/index.js';
+import express from "express";
 import cors from "cors";
-import { courses, modules, users, enrollments, assignments } from "./Kanbas/Database/index.js";
+import UserRoutes from "./Kanbas/Users/routes.js";
+import CourseRoutes from "./Kanbas/Courses/routes.js";
+import ModulesRoutes from "./Kanbas/Modules/routes.js";
+import AssignmentRoutes from "./Kanbas/Assignments/routes.js";
+import EnrollmentRoutes from "./Kanbas/Enrollments/routes.js";
 
 const app = express();
 app.use(cors()); // CORS middleware
 app.use(express.json()); // Parse JSON request bodies
 
-// Kanbas routes
-app.get("/courses", (req, res) => res.json(courses));
-app.get("/modules", (req, res) => res.json(modules));
-app.get("/users", (req, res) => res.json(users));
-app.get("/enrollments", (req, res) => res.json(enrollments));
-app.get("/assignments", (req, res) => res.json(assignments));
-
-Lab5(app);  // Pass the app instance to Lab5
-Hello(app); // Pass the app instance to Hello
+// Attach routes
+UserRoutes(app);
+CourseRoutes(app);
+ModulesRoutes(app);
+AssignmentRoutes(app);
+EnrollmentRoutes(app);
 
 const PORT = process.env.PORT || 4000;
 app.listen(PORT, () => {
