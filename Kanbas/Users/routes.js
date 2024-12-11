@@ -3,93 +3,154 @@ import * as dao from "./dao.js";
 let currentUser = null; // Tracks logged-in user
 
 export default function UserRoutes(app) {
-  app.get("/api/users", (req, res) => {
-    const users = dao.findAllUsers();
+  // Async signin route
+  const signin = async (req, res) => {
+    try {
+      const { username, password } = req.body;
+      currentUser = await dao.findUserByCredentials(username, password);
+
+      if (currentUser) {
+        res.json(currentUser);
+      } else {
+        res.status(401).json({ message: "Invalid username or password." });
+      }
+    } catch (error) {
+      res.status(500).json({ message: "An error occurred during signin." });
+    }
+  };
+
+  // Async signup route
+  const signup = async (req, res) => {
+    try {
+      const { username, password } = req.body;
+
+      if (!username || !password) {
+        return res.status(400).json({ message: "Username and password are required." });
+      }
+
+      const existingUser = await dao.findUserByUsername(username);
+      if (existingUser) {
+        return res.status(400).json({ message: "Username already in use." });
+      }
+
+      const newUser = await dao.createUser({ username, password, role: "USER" });
+      currentUser = newUser; // Set the newly created user as the current user
+      res.status(201).json(newUser);
+    } catch (error) {
+      res.status(500).json({ message: "An error occurred during signup." });
+    }
+  };
+
+  // Async profile fetch route
+  const getProfile = async (req, res) => {
+    if (!currentUser) {
+      return res.status(401).json({ message: "No user is currently logged in." });
+    }
+    res.json(currentUser);
+  };
+
+  // Async profile update route
+  const updateProfile = async (req, res) => {
+    if (!currentUser) {
+      return res.status(401).json({ message: "No user is currently logged in." });
+    }
+
+    try {
+      const updates = req.body;
+      currentUser = { ...currentUser, ...updates }; // Update in-memory user data
+      await dao.updateUser(currentUser._id, currentUser); // Reflect changes in the database
+      res.json(currentUser);
+    } catch (error) {
+      res.status(500).json({ message: "An error occurred during profile update." });
+    }
+  };
+
+  // Map routes to functions
+  app.post("/api/users/signin", signin);
+  app.post("/api/users/signup", signup);
+  app.get("/api/users/profile", getProfile);
+  app.put("/api/users/profile", updateProfile);
+  app.get("/api/users", findAllUsers);
+  app.get("/api/users/:userId", findUserById);
+  app.delete("/api/users/:userId", deleteUser);
+  app.put("/api/users/:userId", updateUser);
+  app.get("/api/users/:uid/courses", findCoursesForUser);
+
+  // Remaining routes
+  const findAllUsers = async (req, res) => {
+    const { role, name } = req.query;
+
+    if (role) {
+      const users = await dao.findUsersByRole(role);
+      res.json(users);
+      return;
+    }
+
+    if (name) {
+      const users = await dao.findUsersByPartialName(name);
+      res.json(users);
+      return;
+    }
+
+    const users = await dao.findAllUsers();
     res.json(users);
-  });
+  };
 
-  app.get("/api/users/:id", (req, res) => {
-    const user = dao.findUserById(req.params.id);
-    if (!user) {
-      return res.status(404).json({ error: "User not found" });
+  const findUserById = async (req, res) => {
+    try {
+      const user = await dao.findUserById(req.params.userId);
+      if (!user) {
+        return res.status(404).json({ message: "User not found" });
+      }
+      res.json(user);
+    } catch (error) {
+      res.status(500).json({ message: "Error retrieving user" });
     }
-    res.json(user);
-  });
+  };
 
-  app.post("/api/users", (req, res) => {
-    const newUser = dao.createUser(req.body);
+  app.post("/api/users", async (req, res) => {
+    const newUser = await dao.createUser(req.body);
     res.status(201).json(newUser);
   });
 
-  app.put("/api/users/:id", (req, res) => {
-    const updatedUser = dao.updateUser(req.params.id, req.body);
-    if (!updatedUser) {
-      return res.status(404).json({ error: "User not found" });
-    }
-    res.json(updatedUser);
-  });
+  const updateUser = async (req, res) => {
+    const { userId } = req.params;
+    const userUpdates = req.body;
 
-  app.delete("/api/users/:id", (req, res) => {
-    const deleted = dao.deleteUser(req.params.id);
-    if (!deleted) {
-      return res.status(404).json({ error: "User not found" });
-    }
-    res.sendStatus(204);
-  });
+    await dao.updateUser(userId, userUpdates);
 
-  // Sign-in route
-  app.post("/kanbas/signin", (req, res) => {
-    const { username, password } = req.body;
-
-    const user = dao.findUserByCredentials(username, password);
-
-    if (!user) {
-      // If no user is found, return 401 Unauthorized
-      return res.status(401).json({ message: "Invalid username or password" });
+    const currentUser = req.session["currentUser"];
+    if (currentUser && currentUser._id === userId) {
+      req.session["currentUser"] = { ...currentUser, ...userUpdates };
     }
 
-    // If user is found, return the user object
-    res.json(user);
-  });
-
-
-  // Sign-up route
-  app.post("/api/users/signup", (req, res) => {
-    const { username, password } = req.body;
-
-    if (!username || !password) {
-      return res.status(400).json({ message: "Username and password are required." });
-    }
-
-    // Check if the username is already taken using the DAO
-    const existingUser = dao.findUserByUsername(username);
-    if (existingUser) {
-      return res.status(400).json({ message: "Username already in use." });
-    }
-
-    // Create a new user using the DAO
-    const newUser = dao.createUser({ username, password, role: "USER" });
-
-    // Respond with the newly created user
-    res.status(201).json(newUser);
-  });
-
-  // Fetch user profile
-  app.get("/kanbas/profile", (req, res) => {
-    if (!currentUser) {
-      return res.status(401).json({ message: "No user is currently logged in." });
-    }
     res.json(currentUser);
-  });
+  };
 
-  // Update user profile
-  app.put("/kanbas/profile", (req, res) => {
+  const deleteUser = async (req, res) => {
+    const status = await dao.deleteUser(req.params.userId);
+    res.json(status);
+  };
+
+  const findCoursesForUser = async (req, res) => {
+    const currentUser = req.session["currentUser"];
     if (!currentUser) {
-      return res.status(401).json({ message: "No user is currently logged in." });
+      res.sendStatus(401);
+      return;
     }
-    const updates = req.body;
-    currentUser = { ...currentUser, ...updates }; // Update in-memory user data
-    dao.updateUser(currentUser._id, currentUser); // Reflect changes in the mock database
-    res.json(currentUser);
-  });
+
+    if (currentUser.role === "ADMIN") {
+      const courses = await courseDao.findAllCourses();
+      res.json(courses);
+      return;
+    }
+
+    let { uid } = req.params;
+    if (uid === "current") {
+      uid = currentUser._id;
+    }
+
+    const courses = await enrollmentsDao.findCoursesForUser(uid);
+    res.json(courses);
+  };
 }

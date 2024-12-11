@@ -1,25 +1,20 @@
 import courses from "../Database/courses.js";
+import model from "./model.js";
 
-export const findAllCourses = () => courses;
+export function findAllCourses() {
+  return model.find(); // Retrieve all courses from the database
+}
 
-export const findCourseById = (id) => courses.find((course) => course._id === id);
+export function createCourse(course) {
+  delete course._id; // Ensure the client doesn't send an ID
+  return model.create(course); // Insert the new course
+}
 
-export const createCourse = (newCourse) => {
-  const course = { ...newCourse, _id: Date.now().toString() };
-  courses.push(course);
-  return course;
-};
 
-export const updateCourse = (id, updatedCourse) => {
-  const index = courses.findIndex((course) => course._id === id);
-  if (index === -1) return null;
-  courses[index] = { ...courses[index], ...updatedCourse };
-  return courses[index];
-};
+export function deleteCourse(courseId) {
+  return model.deleteOne({ _id: courseId });
+}
 
-export const deleteCourse = (id) => {
-  const index = courses.findIndex((course) => course._id === id);
-  if (index === -1) return false;
-  courses.splice(index, 1);
-  return true;
-};
+export function updateCourse(courseId, courseUpdates) {
+  return model.updateOne({ _id: courseId }, { $set: courseUpdates });
+}

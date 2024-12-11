@@ -7,12 +7,9 @@ export default function ModulesRoutes(app) {
     res.json(modules);
   });
 
-  app.get("/api/modules/course/:courseId", (req, res) => {
+  app.get("/api/modules/:courseId/modules", async (req, res) => {
     const { courseId } = req.params;
-    const modules = dao.findModulesForCourse(courseId);
-    if (!modules || modules.length === 0) {
-      return res.status(404).json({ error: "Modules not found for the given course ID" });
-    }
+    const modules = await dao.findModulesForCourse(courseId);
     res.json(modules);
   });
 
@@ -22,15 +19,21 @@ export default function ModulesRoutes(app) {
     res.json(module);
   });
 
-  app.post("/api/modules", (req, res) => {
-    const newModule = dao.createModule(req.body);
-    res.status(201).json(newModule);
+  app.post("/api/modules/:courseId/modules", async (req, res) => {
+    const { courseId } = req.params;
+    const module = {
+      ...req.body,
+      course: courseId, // Associate the module with the course
+    };
+    const newModule = await modulesDao.createModule(module);
+    res.send(newModule);
   });
 
-  app.put("/api/modules/:id", (req, res) => {
-    const updatedModule = dao.updateModule(req.params.id, req.body);
-    if (!updatedModule) return res.status(404).json({ error: "Module not found" });
-    res.json(updatedModule);
+  app.put("/api/modules/:moduleId", async (req, res) => {
+    const { moduleId } = req.params; // Extract module ID from path parameters
+    const moduleUpdates = req.body; // Extract updates from request body
+    const status = await modulesDao.updateModule(moduleId, moduleUpdates); // Update module in database
+    res.send(status); // Send the update status back to the client
   });
 
   app.delete("/api/modules/:id", (req, res) => {

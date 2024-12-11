@@ -1,4 +1,6 @@
 import modules from "../Database/modules.js";
+import model from "./model.js";
+
 
 // Find all modules
 export const findAllModules = () => modules;
@@ -9,24 +11,18 @@ export const findModuleById = (id) => {
 };
 
 export function findModulesForCourse(courseId) {
-  return modules.filter((module) => module.course === courseId);
+  return model.find({ course: courseId }); // Retrieve modules by course ID
 }
 
 // Create a new module
-export const createModule = (newModule) => {
-  const module = { ...newModule, _id: Date.now().toString() };
-  modules.push(module);
-  return module;
-};
-
-// Update a module
-export const updateModule = (id, updatedModule) => {
-  const index = modules.findIndex((module) => module._id === id);
-  if (index === -1) return null;
-
-  modules[index] = { ...modules[index], ...updatedModule };
-  return modules[index];
-};
+export function createModule(module) {
+  delete module._id; // Remove _id to let MongoDB generate it
+  return model.create(module);
+}
+// Update a module by ID
+export function updateModule(moduleId, moduleUpdates) {
+  return model.updateOne({ _id: moduleId }, { $set: moduleUpdates }); // Use $set for partial updates
+}
 
 // Delete a module
 export const deleteModule = (id) => {
