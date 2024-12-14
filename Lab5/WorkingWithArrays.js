@@ -7,7 +7,7 @@ export default function WorkingWithArrays(app) {
   ];
 
 
-  app.get("/lab5/todos", (req, res) => {
+  app.get("/api/lab5/todos", (req, res) => {
     res.json(todos);
   });
 
@@ -22,14 +22,14 @@ export default function WorkingWithArrays(app) {
   // });
 
   // New POST route for creating a todo
-  app.post("/lab5/todos", (req, res) => {
+  app.post("/api/lab5/todos", (req, res) => {
     const newTodo = { ...req.body, id: new Date().getTime() };
     todos.push(newTodo);
     res.json(newTodo);
   });
 
   // Create todo
-  app.get("/lab5/todos/create", (req, res) => {
+  app.get("/api/lab5/todos/create", (req, res) => {
     const newTodo = {
       id: new Date().getTime(),
       title: "New Task",
@@ -40,7 +40,7 @@ export default function WorkingWithArrays(app) {
   });
 
   // Retrieve a todo by ID
-  app.get("/lab5/todos/:id", (req, res) => {
+  app.get("/api/lab5/todos/:id", (req, res) => {
     const { id } = req.params;
     const todo = todos.find((t) => t.id === parseInt(id));
     res.json(todo);
@@ -57,7 +57,7 @@ export default function WorkingWithArrays(app) {
   // });
 
   // New DELETE route for deleting a todo
-  app.delete("/lab5/todos/:id", (req, res) => {
+  app.delete("/api/lab5/todos/:id", (req, res) => {
     const { id } = req.params;
     const todoIndex = todos.findIndex((t) => t.id === parseInt(id));
     if (todoIndex !== -1) {
@@ -67,7 +67,7 @@ export default function WorkingWithArrays(app) {
   });
 
   // Update a todo's title by ID
-  app.get("/lab5/todos/:id/title/:title", (req, res) => {
+  app.get("/api/lab5/todos/:id/title/:title", (req, res) => {
     const { id, title } = req.params;
     const todo = todos.find((t) => t.id === parseInt(id));
     if (todo) {
@@ -77,7 +77,7 @@ export default function WorkingWithArrays(app) {
   });
 
   // Update completed property
-  app.get("/lab5/todos/:id/completed/:completed", (req, res) => {
+  app.get("/api/lab5/todos/:id/completed/:completed", (req, res) => {
     const { id, completed } = req.params;
     const todo = todos.find((t) => t.id === parseInt(id));
     if (todo) {
@@ -87,7 +87,7 @@ export default function WorkingWithArrays(app) {
   });
 
   // Update description property
-  app.get("/lab5/todos/:id/description/:description", (req, res) => {
+  app.get("/api/lab5/todos/:id/description/:description", (req, res) => {
     const { id, description } = req.params;
     const todo = todos.find((t) => t.id === parseInt(id));
     if (todo) {
@@ -97,7 +97,7 @@ export default function WorkingWithArrays(app) {
   });
 
   // Add PUT route for updating todos
-  app.put("/lab5/todos/:id", (req, res) => {
+  app.put("/api/lab5/todos/:id", (req, res) => {
     const { id } = req.params;
     todos = todos.map((t) =>
       t.id === parseInt(id) ? { ...t, ...req.body } : t
