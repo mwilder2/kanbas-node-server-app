@@ -12,13 +12,13 @@ export default function EnrollmentRoutes(app) {
 
   app.post(ENROLLMENTS_API, (req, res) => {
     const { userId, courseId } = req.body;
-    const newEnrollment = enrollmentsDao.enrollUser(userId, courseId);
+    const newEnrollment = enrollmentsDao.enrollUserInCourse(userId, courseId);
     res.status(201).json(newEnrollment);
   });
 
   app.delete(`${ENROLLMENTS_API}/:userId/:courseId`, (req, res) => {
     const { userId, courseId } = req.params;
-    const success = enrollmentsDao.unenrollUser(userId, courseId);
+    const success = enrollmentsDao.unenrollUserInCourse(userId, courseId);
     if (!success) return res.status(404).json({ error: "Enrollment not found" });
     res.sendStatus(204);
   });

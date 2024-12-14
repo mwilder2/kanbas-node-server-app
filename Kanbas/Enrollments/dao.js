@@ -4,13 +4,12 @@ export function findAllEnrollments() {
   return enrollments;
 }
 
-export function enrollUser(userId, courseId) {
-  const newEnrollment = { _id: Date.now().toString(), user: userId, course: courseId };
-  enrollments.push(newEnrollment);
-  return newEnrollment;
+
+export function enrollUserInCourse(userId, courseId) {
+  enrollments.push({ _id: Date.now().toString(), user: userId, course: courseId });
 }
 
-export function unenrollUser(userId, courseId) {
+export function unenrollUserInCourse(userId, courseId) {
   const index = enrollments.findIndex(
     (enrollment) => enrollment.user === userId && enrollment.course === courseId
   );
