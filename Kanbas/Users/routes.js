@@ -65,17 +65,6 @@ export default function UserRoutes(app) {
     }
   };
 
-  // Map routes to functions
-  app.post("/api/users/signin", signin);
-  app.post("/api/users/signup", signup);
-  app.get("/api/users/profile", getProfile);
-  app.put("/api/users/profile", updateProfile);
-  app.get("/api/users", findAllUsers);
-  app.get("/api/users/:userId", findUserById);
-  app.delete("/api/users/:userId", deleteUser);
-  app.put("/api/users/:userId", updateUser);
-  app.get("/api/users/:uid/courses", findCoursesForUser);
-
   // Remaining routes
   const findAllUsers = async (req, res) => {
     const { role, name } = req.query;
@@ -153,4 +142,16 @@ export default function UserRoutes(app) {
     const courses = await enrollmentsDao.findCoursesForUser(uid);
     res.json(courses);
   };
+
+  // Map routes to functions
+  app.post("/api/users/signin", signin);
+  app.post("/api/users/signup", signup);
+  app.get("/api/users/profile", getProfile);
+  app.put("/api/users/profile", updateProfile);
+  app.get("/api/users", findAllUsers);
+  app.get("/api/users/:userId", findUserById);
+  app.delete("/api/users/:userId", deleteUser);
+  app.put("/api/users/:userId", updateUser);
+  app.get("/api/users/:uid/courses", findCoursesForUser);
 }
+
